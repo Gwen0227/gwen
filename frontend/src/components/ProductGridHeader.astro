@@ -1,0 +1,167 @@
+---
+import TextSlider from "../components/TextSlider.astro";
+
+type Props = {
+	productsTotal?: number;
+	activeCategory?: string;
+};
+
+const { productsTotal = 3, activeCategory = "all" } = Astro.props;
+
+// 預設分類清單
+const categories = [
+	{ id: "all", label: "All" },
+	{ id: "Brand", label: "Brand" },
+	{ id: "Visual", label: "Visual" },
+	{ id: "Packaging", label: "Packaging" },
+];
+---
+
+<div class="category-wrapper">
+	<div class="full-width-bg"></div>
+
+	<header class="project-filter">
+		<div class="categories">
+			{categories.map((cat) => {
+				const isActive = cat.id.toLowerCase() === activeCategory.toLowerCase();
+				return (
+					<button 
+						data-filter={cat.id} 
+						class={isActive ? "active" : ""}
+					>
+						<TextSlider content={cat.label} />
+					</button>
+				);
+			})}
+		</div>
+
+		<span class="count">
+			<TextSlider content={`${productsTotal} Projects`} />
+		</span>
+	</header>
+</div>
+
+<script>
+	function initFilter() {
+		const buttons = document.querySelectorAll('.categories button');
+		const cards = document.querySelectorAll('[data-category]') as NodeListOf<HTMLElement>;
+
+		if (!buttons.length) return;
+
+		buttons.forEach(button => {
+			button.addEventListener('click', () => {
+				const filterValue = button.getAttribute('data-filter');
+
+				buttons.forEach(btn => btn.classList.remove('active'));
+				button.classList.add('active');
+
+				// 如果不在首頁，點擊分類按鈕時跳回首頁並帶上參數
+				if (window.location.pathname !== "/") {
+					window.location.href = filterValue === "all" ? "/" : `/?category=${filterValue}`;
+					return;
+				}
+
+				cards.forEach(card => {
+					const cardCategory = card.getAttribute('data-category');
+
+					if (filterValue === 'all' || cardCategory === filterValue) {
+						card.style.display = '';
+						card.style.opacity = '1';
+					} else {
+						card.style.display = 'none';
+					}
+				});
+			});
+		});
+	}
+
+	initFilter();
+	document.addEventListener('astro:page-load', initFilter);
+</script>
+
+<style>
+	/* 🎯 主容器：跟網頁主內容寬度完全一致 */
+	.category-wrapper {
+		position: relative;
+		width: 100%;
+		margin-top: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	/* 🎯 滿版灰底：用 absolute 獨立延伸出去，不影響內文排版 */
+	.full-width-bg {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: 100vw;
+		transform: translateX(-50%);
+		background-color: #f1f1f1;
+		z-index: 0;
+	}
+
+	/* 🎯 文字選單內容：貼齊左右邊緣，且層級比灰底高 */
+	.project-filter {
+		position: relative;
+		z-index: 1;
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.15rem 0; /* 上下留少許內邊距 */
+		font-size: 0.85rem; 
+		box-sizing: border-box;
+		white-space: nowrap;
+	}
+
+	.categories {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.categories::-webkit-scrollbar {
+		display: none;
+	}
+
+	.categories button {
+		background: transparent;
+		border: none;
+		padding: 0.2rem 0;
+
+		font-family: inherit;
+		font-size: inherit;
+		font-weight: normal; 
+		
+		cursor: pointer;
+		color: #888888;
+
+		transition: color 0.2s ease, font-weight 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.categories button.active {
+		color: #000000;
+		font-weight: 700;
+	}
+
+	.categories button:hover {
+		color: #000000;
+	}
+
+	.count {
+		font-weight: normal; 
+		color: #888888;
+		white-space: nowrap;
+		flex-shrink: 0;
+		margin-left: 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.categories {
+			gap: 1rem;
+		}
+	}
+</style>

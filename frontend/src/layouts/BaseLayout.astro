@@ -1,0 +1,123 @@
+---
+import { ClientRouter } from "astro:transitions";
+
+import "../styles/global.css";
+
+import { SEO } from "astro-seo";
+
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import SmoothScroll from "../components/SmoothScroll.astro";
+
+import "@fontsource-variable/instrument-sans";
+import instrumentSansWoff2 from "@fontsource-variable/instrument-sans/files/instrument-sans-latin-wght-normal.woff2";
+
+type Props = {
+	title: string;
+	description?: string;
+};
+
+const { title, description = "陳沛涓的個人作品集" } = Astro.props;
+
+// Current page value (/home, /about, /404 ...)
+const currentPage =
+	Astro.url.pathname.replace(/\/$/, "").split("/").pop() || "home";
+---
+
+<!doctype html>
+<html lang="en" data-page={currentPage}>
+  <head>
+    <SEO
+      title={title}
+      description={description}
+      charset="UTF-8"
+      openGraph={{
+        basic: {
+          title: title,
+          type: "image/jpeg",
+          image: "/playersclub-og.jpg",
+        },
+      }}
+      extend={{
+        // extending the default link tags
+        link: [
+          {
+            rel: "icon",
+            type: "image/png",
+            sizes: "16x16",
+            href: "/favicon/favicon-16x16.png",
+          },
+          {
+            rel: "icon",
+            type: "image/png",
+            sizes: "32x32",
+            href: "/favicon/favicon-32x32.png",
+          },
+          {
+            rel: "apple-touch-icon",
+            sizes: "180x180",
+            href: "/favicon/apple-touch-icon.png",
+          },
+          { rel: "manifest", href: "/favicon/site.webmanifest" },
+          { rel: "sitemap", href: "/sitemap-index.xml" },
+          {
+            rel: "preload",
+            href: instrumentSansWoff2,
+            as: "font",
+            type: "font/woff2",
+            crossorigin: "anonymous",
+          },
+        ],
+        // extending the default meta tags
+        meta: [
+          { name: "viewport", content: "width=device-width" },
+          { name: "msapplication-TileColor", content: "#000000" },
+          { name: "theme-color", content: "#ffffff" },
+          { name: "generator", content: Astro.generator },
+        ],
+      }}
+    />
+    <ClientRouter />
+
+    <style is:global>
+      .hover-reveal,
+      [class*="hover-reveal"],
+      [class*="cursor"],
+      #cursor,
+      canvas.hover-canvas {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+
+      /* 🎯 全局容器：解除 1200px 限制，讓所有頁面（Header, About, Contact, [slug]）統一對齊 */
+      .site-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        padding-left: 1.5rem; /* 桌機版統一左右留白 */
+        padding-right: 1.5rem;
+        box-sizing: border-box;
+      }
+
+      @media (max-width: 768px) {
+        .site-container {
+          padding-left: 0.5rem; /* 手機版統一左右留白 */
+          padding-right: 0.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <SmoothScroll />
+    
+    <div class="site-container">
+      <Header />
+      <main>
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

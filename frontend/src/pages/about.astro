@@ -1,0 +1,113 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const title = "About | Chen-Pei Jyuan";
+---
+
+<BaseLayout title={title}>
+	<section class="content">
+		<h1>About</h1>
+
+		<p class="intro">
+			Hi, I'm <strong>Chen-Pei Jyuan</strong>, a Brand & Visual Designer
+			based in Taiwan.
+		</p>
+
+		<p class="desc">
+			I focus on creating brand identities, visual systems, packaging,
+			editorial design and digital experiences that combine aesthetics with
+			clear communication.
+		</p>
+
+		<div class="info">
+			<div>
+				<h2>Expertise</h2>
+
+				<ul>
+					<li>Brand Identity</li>
+					<li>Visual Design</li>
+					<li>Packaging Design</li>
+					<li>Typography</li>
+				</ul>
+			</div>
+
+			<div>
+				<h2>Tools</h2>
+
+				<ul>
+					<li>Adobe Illustrator</li>
+					<li>Adobe Photoshop</li>
+					<li>Adobe InDesign</li>
+					<li>Figma</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	/* 🎯 主容器：100% 寬度，徹底對齊 Header */
+	.content {
+		width: 100%;
+		margin: 1.5rem 0 6rem;
+		box-sizing: border-box;
+	}
+
+	h1 {
+		font-size: 2rem;
+		font-weight: 700;
+		color: #000000;
+		margin: 0 0 1.5rem 0;
+		line-height: 1.3;
+	}
+
+	.intro {
+		font-size: 1.15rem;
+		color: #111111;
+		margin-bottom: 1rem;
+		line-height: 1.6;
+	}
+
+	.desc {
+		font-size: 0.95rem;
+		color: #444444;
+		line-height: 1.85;
+		margin-bottom: 2.5rem;
+	}
+
+	.info {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 3rem;
+		margin-top: 3rem;
+		padding-top: 2rem;
+		border-top: 1px solid #eeeeee;
+	}
+
+	h2 {
+		font-size: 1rem;
+		font-weight: 700;
+		color: #000000;
+		margin-bottom: 1rem;
+	}
+
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		font-size: 0.9rem;
+		color: #555555;
+		line-height: 2;
+	}
+
+	@media (max-width: 768px) {
+		h1 {
+			font-size: 1.3rem;
+		}
+
+		.info {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+	}
+</style>

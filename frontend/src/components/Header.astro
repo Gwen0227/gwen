@@ -1,0 +1,165 @@
+---
+import TextSlider from "../components/TextSlider.astro";
+
+const currentPath = Astro.url.pathname;
+const normalizedPath = currentPath.replace(/\/$/, "") || "/";
+
+let currentTab = "Projects";
+if (normalizedPath === "/about") {
+	currentTab = "About";
+} else if (normalizedPath === "/contact") {
+	currentTab = "Contact";
+}
+---
+
+<header>
+	<div class="header-main">
+		<div class="branding-inline">
+			<h1 class="logo-group">
+				<a href="/">
+					<TextSlider content="Chen-Pei Jyuan" />
+				</a>
+			</h1>
+
+			<span class="role">
+				<TextSlider content="Brand & Visual Designer" />
+			</span>
+		</div>
+
+		<ul class="nav-menu">
+			<li>
+				<a href="/" class={currentTab === "Projects" ? "current" : ""} data-astro-prefetch>
+					<TextSlider content="Projects" />
+				</a>
+			</li>
+
+			<li>
+				<a href="/about" class={currentTab === "About" ? "current" : ""} data-astro-prefetch>
+					<TextSlider content="About" />
+				</a>
+			</li>
+
+			<li>
+				<a href="/contact" class={currentTab === "Contact" ? "current" : ""} data-astro-prefetch>
+					<TextSlider content="Contact" />
+				</a>
+			</li>
+		</ul>
+	</div>
+</header>
+
+<style>
+	header {
+		position: relative;
+		width: 100%;
+		z-index: 3;
+	}
+
+	.header-main {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		padding: 1.25rem 0;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+
+	/* 🎯 關鍵：強制名字與職稱在同一行，且永不換行 */
+	.branding-inline {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.75rem;
+		white-space: nowrap; /* 絕對不換行 */
+		flex-shrink: 0;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: 1.2rem;
+		font-weight: 700;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.logo-group a {
+		text-decoration: none;
+		color: #000000;
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.logo-group a::after {
+		display: none !important;
+	}
+
+	.role {
+		font-size: 0.9rem;
+		font-weight: 400;
+		opacity: 0.45;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.nav-menu {
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: 0.9rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.nav-menu a {
+		position: relative;
+		text-decoration: none;
+		color: #000000;
+		padding-bottom: 0.3rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* 4px 黑色厚底線 */
+	.nav-menu a.current::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		bottom: -2px;
+		width: 100%;
+		height: 4px;
+		background-color: #000000;
+	}
+
+	.nav-menu a.current {
+		pointer-events: none;
+	}
+
+	/* 📱 手機與窄螢幕微調 */
+	@media (max-width: 768px) {
+		.header-main {
+			padding: 1rem 0;
+		}
+
+		.branding-inline {
+			gap: 0.5rem;
+		}
+
+		h1 {
+			font-size: 1rem;
+		}
+
+		.role {
+			font-size: 0.8rem;
+		}
+
+		.nav-menu {
+			gap: 1.25rem;
+			font-size: 0.85rem;
+		}
+	}
+</style>

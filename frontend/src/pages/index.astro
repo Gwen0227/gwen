@@ -1,0 +1,20 @@
+---
+import { getCollection } from "astro:content";
+import Preloader from "../components/Preloader.astro";
+import ProductGrid from "../components/ProductGrid.astro";
+import ProductGridHeader from "../components/ProductGridHeader.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const allProjects = await getCollection("projects");
+const projectsTotal = allProjects.length;
+
+const title = "Pei Jyuan Personal Portfolio";
+---
+
+<BaseLayout title={title}>
+	<Preloader />
+
+	<ProductGridHeader productsTotal={projectsTotal} />
+
+	<ProductGrid projects={allProjects} />
+</BaseLayout>

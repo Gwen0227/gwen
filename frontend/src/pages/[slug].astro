@@ -1,0 +1,214 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProductGridHeader from "../components/ProductGridHeader.astro";
+
+export async function getStaticPaths() {
+	const projects = await getCollection("projects");
+	return projects.map((project) => ({
+		params: { slug: project.data.slug },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+
+if (!project) {
+	throw new Error("Project not found");
+}
+
+const { Content } = await render(project);
+
+// 🎯 取得所有專案列表與數量
+const allProjects = (await getCollection("projects")) || [];
+const productsTotal = allProjects.length;
+
+// 🎯 取得該作品的分類，若無則預設為 "all"
+const activeCategory = project.data?.category || "all";
+---
+
+<BaseLayout title={project.data.title}>
+	<ProductGridHeader 
+		activeCategory={activeCategory} 
+		productsTotal={productsTotal} 
+	/>
+
+	<article class="project-detail">
+		<header class="project-header">
+			<h1 class="main-title">{project.data.title}</h1>
+		</header>
+
+		{project.data.cover && (
+			<figure class="featured-image">
+				<img 
+					src={project.data.cover} 
+					alt={project.data.title} 
+					class="protected-img" 
+				/>
+			</figure>
+		)}
+
+		<div class="prose">
+			<Content />
+		</div>
+	</article>
+</BaseLayout>
+
+<style>
+	/* 🎯 主容器：100% 貼合外層 Layout 的左右留白邊界 */
+	.project-detail {
+		width: 100%;
+		margin: 1.5rem 0 6rem;
+		box-sizing: border-box;
+	}
+
+	.project-header {
+		margin-bottom: 1.5rem;
+	}
+
+	/* 🎯 文章主標題：使用 !important 確保字體能順利放大 */
+	.main-title {
+		font-size: 3.2rem !important; /* 👈 可調整大標題大小 (例如 3rem, 3.5rem, 4rem) */
+		font-weight: 500 !important;
+		color: #000000 !important;
+		margin: 0 !important;
+		line-height: 1.2 !important;
+		letter-spacing: -0.02em !important;
+	}
+
+	/* 🎯 封面大圖容器 (16:9 比例) */
+	.featured-image {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		margin: 0 0 2.5rem 0;
+		overflow: hidden;
+		background: #f9f9f9;
+		border-radius: 4px;
+	}
+
+	.featured-image .protected-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		user-select: none;
+		-webkit-user-drag: none;
+		filter: blur(0.6px);
+		transition: filter 0.3s ease;
+		margin-bottom: 0;
+	}
+
+	/* 🎯 Markdown 內文裡的圖片樣式 */
+	.prose :global(img) {
+		width: 100%;
+		height: auto;
+		display: block;
+		border-radius: 4px;
+		user-select: none;
+		-webkit-user-drag: none;
+		filter: blur(0.6px);
+		transition: filter 0.3s ease;
+		margin-bottom: 0.5rem;
+	}
+
+	.protected-img:hover, 
+	.prose :global(img:hover) {
+		filter: blur(0);
+	}
+
+	/* 🎯 Markdown 內文排版 (.prose) */
+	.prose {
+		width: 100%;
+		color: #222222;
+		font-size: 0.95rem;
+		line-height: 1.85;
+	}
+
+	/* 🎯 Markdown 內文裡的大標題 (h1) 與中標題 (h2) 放大調整 */
+	.prose :global(h1) {
+		font-size: 2.5rem !important;
+		font-weight: 700 !important;
+		color: #000000 !important;
+		margin-top: 3.5rem !important;
+		margin-bottom: 1rem !important;
+		line-height: 1.25 !important;
+	}
+
+	.prose :global(h2) {
+		font-size: 1.6rem !important;
+		font-weight: 700 !important;
+		color: #000000 !important;
+		margin-top: 3rem !important;
+		margin-bottom: 0.75rem !important;
+		line-height: 1.35 !important;
+	}
+
+	.prose :global(h3) {
+		font-size: 1.2rem !important;
+		font-weight: 700 !important;
+		color: #000000 !important;
+		margin-top: 2rem !important;
+		margin-bottom: 0.75rem !important;
+	}
+
+	/* 🖤 獨立的黑色斜線裝飾元素 */
+	.prose :global(hr.slash) {
+		border: none;
+		outline: none;
+		width: 40px;
+		height: 0.8px;
+		background-color: #000000;
+		margin: 1.5rem 0 2.2rem 0;
+		transform: rotate(-25deg);
+		transform-origin: left center;
+	}
+
+	/* 段落內文 */
+	.prose :global(p) {
+		margin-bottom: 1.5rem;
+		text-align: justify;
+		word-break: break-word;
+	}
+
+	/* 圖說（灰色小字） */
+	.prose :global(figcaption),
+	.prose :global(p img + em),
+	.prose :global(p img + br + em),
+	.prose :global(p img + span) {
+		display: block;
+		margin-top: 0.5rem;
+		margin-bottom: 2.2rem;
+		font-style: normal;
+		font-size: 0.68rem !important;
+		color: #888888 !important;
+		line-height: 1.5;
+		letter-spacing: 0.02em;
+	}
+
+	/* 清單樣式 */
+	.prose :global(ul), 
+	.prose :global(ol) {
+		margin-left: 1.2rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.prose :global(li) {
+		margin-bottom: 0.4rem;
+	}
+
+	/* 📱 手機版調整 */
+	@media (max-width: 768px) {
+		.main-title {
+			font-size: 2rem !important;
+		}
+
+		.prose :global(h1) {
+			font-size: 1.8rem !important;
+		}
+
+		.prose :global(h2) {
+			font-size: 1.3rem !important;
+			margin-top: 2rem !important;
+		}
+	}
+</style>
