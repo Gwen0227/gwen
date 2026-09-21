@@ -66,9 +66,9 @@ const activeCategory = project.data?.category || "all";
 		margin-bottom: 1.5rem;
 	}
 
-	/* 🎯 文章主標題：使用 !important 確保字體能順利放大 */
+	/* 🎯 文章主標題 */
 	.main-title {
-		font-size: 3.2rem !important; /* 👈 可調整大標題大小 (例如 3rem, 3.5rem, 4rem) */
+		font-size: 3.2rem !important;
 		font-weight: 500 !important;
 		color: #000000 !important;
 		margin: 0 !important;
@@ -98,9 +98,34 @@ const activeCategory = project.data?.category || "all";
 		margin-bottom: 0;
 	}
 
-	/* 🎯 Markdown 內文裡的圖片樣式 */
-	.prose :global(img) {
+	/* 🎯 Markdown 內文排版 (.prose)：改為彈性並排容器 */
+	.prose {
 		width: 100%;
+		color: #222222;
+		font-size: 0.95rem;
+		line-height: 1.85;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+	}
+
+	/* 段落內文：一般文字佔滿一整行 */
+	.prose :global(p) {
+		width: 100%;
+		margin-bottom: 1.5rem;
+		text-align: justify;
+		word-break: break-word;
+	}
+
+	/* 讓純圖片的段落自動解構並參與並排 */
+	.prose :global(p:has(img)) {
+		display: contents;
+	}
+
+	/* 🎯 Markdown 內文裡的圖片樣式：寬螢幕自動各佔一半空間並排 */
+	.prose :global(img) {
+		flex: 1 1 calc(50% - 0.75rem);
+		min-width: 280px;
 		height: auto;
 		display: block;
 		border-radius: 4px;
@@ -108,7 +133,8 @@ const activeCategory = project.data?.category || "all";
 		-webkit-user-drag: none;
 		filter: blur(0.6px);
 		transition: filter 0.3s ease;
-		margin-bottom: 0.5rem;
+		margin-bottom: 0;
+		object-fit: cover;
 	}
 
 	.protected-img:hover, 
@@ -116,16 +142,9 @@ const activeCategory = project.data?.category || "all";
 		filter: blur(0);
 	}
 
-	/* 🎯 Markdown 內文排版 (.prose) */
-	.prose {
-		width: 100%;
-		color: #222222;
-		font-size: 0.95rem;
-		line-height: 1.85;
-	}
-
-	/* 🎯 Markdown 內文裡的大標題 (h1) 與中標題 (h2) 放大調整 */
+	/* 🎯 Markdown 內文裡的大標題 (h1) 與中標題 (h2) 佔滿整行 */
 	.prose :global(h1) {
+		width: 100%;
 		font-size: 2.5rem !important;
 		font-weight: 700 !important;
 		color: #000000 !important;
@@ -135,6 +154,7 @@ const activeCategory = project.data?.category || "all";
 	}
 
 	.prose :global(h2) {
+		width: 100%;
 		font-size: 1.6rem !important;
 		font-weight: 700 !important;
 		color: #000000 !important;
@@ -144,6 +164,7 @@ const activeCategory = project.data?.category || "all";
 	}
 
 	.prose :global(h3) {
+		width: 100%;
 		font-size: 1.2rem !important;
 		font-weight: 700 !important;
 		color: #000000 !important;
@@ -153,6 +174,7 @@ const activeCategory = project.data?.category || "all";
 
 	/* 🖤 獨立的黑色斜線裝飾元素 */
 	.prose :global(hr.slash) {
+		width: 100%;
 		border: none;
 		outline: none;
 		width: 40px;
@@ -163,18 +185,12 @@ const activeCategory = project.data?.category || "all";
 		transform-origin: left center;
 	}
 
-	/* 段落內文 */
-	.prose :global(p) {
-		margin-bottom: 1.5rem;
-		text-align: justify;
-		word-break: break-word;
-	}
-
 	/* 圖說（灰色小字） */
 	.prose :global(figcaption),
 	.prose :global(p img + em),
 	.prose :global(p img + br + em),
 	.prose :global(p img + span) {
+		width: 100%;
 		display: block;
 		margin-top: 0.5rem;
 		margin-bottom: 2.2rem;
@@ -188,6 +204,7 @@ const activeCategory = project.data?.category || "all";
 	/* 清單樣式 */
 	.prose :global(ul), 
 	.prose :global(ol) {
+		width: 100%;
 		margin-left: 1.2rem;
 		margin-bottom: 1.5rem;
 	}
@@ -209,6 +226,11 @@ const activeCategory = project.data?.category || "all";
 		.prose :global(h2) {
 			font-size: 1.3rem !important;
 			margin-top: 2rem !important;
+		}
+
+		/* 手機版時讓圖片自動恢復單張佔滿全寬上下堆疊 */
+		.prose :global(img) {
+			flex: 1 1 100%;
 		}
 	}
 </style>
