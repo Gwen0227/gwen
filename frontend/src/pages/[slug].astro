@@ -5,6 +5,7 @@ import ProductGridHeader from "../components/ProductGridHeader.astro";
 
 export async function getStaticPaths() {
 	const projects = await getCollection("projects");
+
 	return projects.map((project) => ({
 		params: { slug: project.data.slug },
 		props: { project },
@@ -19,54 +20,66 @@ if (!project) {
 
 const { Content } = await render(project);
 
-// 🎯 取得所有專案列表與數量
-const allProjects = (await getCollection("projects")) || [];
+// 所有專案
+const allProjects = await getCollection("projects");
 const productsTotal = allProjects.length;
 
-// 🎯 取得該作品的分類，若無則預設為 "all"
+// 目前分類
 const activeCategory = project.data?.category || "all";
 ---
 
 <BaseLayout title={project.data.title}>
-	<ProductGridHeader 
-		activeCategory={activeCategory} 
-		productsTotal={productsTotal} 
+	<ProductGridHeader
+		activeCategory={activeCategory}
+		productsTotal={productsTotal}
 	/>
 
 	<article class="project-detail">
+
+		<!-- 專案標題 -->
 		<header class="project-header">
 			<h1 class="main-title">{project.data.title}</h1>
 		</header>
 
+		<!-- 封面 -->
 		{project.data.cover && (
 			<figure class="featured-image">
-				<img 
-					src={project.data.cover} 
-					alt={project.data.title} 
-					class="protected-img" 
+				<img
+					src={project.data.cover}
+					alt={project.data.title}
+					class="protected-img"
 				/>
 			</figure>
 		)}
 
+		<!-- Markdown / MDX 內容 -->
 		<div class="prose">
 			<Content />
 		</div>
+
 	</article>
 </BaseLayout>
 
 <style>
-	/* 🎯 主容器：100% 貼合外層 Layout 的左右留白邊界 */
+	/* ========================================
+	   主容器
+	======================================== */
+
 	.project-detail {
 		width: 100%;
 		margin: 1.5rem 0 6rem;
 		box-sizing: border-box;
 	}
 
+
+	/* ========================================
+	   標題
+	======================================== */
+
 	.project-header {
 		margin-bottom: 1.5rem;
 	}
 
-	/* 🎯 文章主標題 */
 	.main-title {
 		font-size: 3.2rem !important;
 		font-weight: 500 !important;
@@ -76,7 +89,11 @@ const activeCategory = project.data?.category || "all";
 		letter-spacing: -0.02em !important;
 	}
 
-	/* 🎯 封面大圖容器 (16:9 比例) */
+
+	/* ========================================
+	   封面圖片
+	======================================== */
+
 	.featured-image {
 		width: 100%;
 		aspect-ratio: 16 / 9;
@@ -95,54 +112,94 @@ const activeCategory = project.data?.category || "all";
 		-webkit-user-drag: none;
 		filter: blur(0.6px);
 		transition: filter 0.3s ease;
-		margin-bottom: 0;
+		margin: 0;
 	}
 
-	/* 🎯 Markdown 內文排版 (.prose)：改為彈性並排容器 */
+	.featured-image .protected-img:hover {
+		filter: blur(0);
+	}
+
+
+	/* ========================================
+	   Markdown 內容
+	======================================== */
+
 	.prose {
 		width: 100%;
 		color: #222222;
 		font-size: 0.95rem;
 		line-height: 1.85;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 1.5rem;
+		box-sizing: border-box;
 	}
 
-	/* 段落內文：一般文字佔滿一整行 */
+	/* 一般段落 */
 	.prose :global(p) {
 		width: 100%;
-		margin-bottom: 1.5rem;
+		margin: 0 0 1.5rem;
 		text-align: justify;
 		word-break: break-word;
 	}
 
-	/* 讓純圖片的段落自動解構並參與並排 */
-	.prose :global(p:has(img)) {
-		display: contents;
+	/* ========================================
+	   Markdown 圖片
+	======================================== */
+
+	/*
+		圖片所在的 <p> 不再使用 display: contents。
+
+		這是原本第三張圖片容易出問題的主要地方。
+	*/
+
+	.prose :global(p:has(> img:only-child)) {
+		width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+		margin: 0 0 1.5rem;
 	}
 
-	/* 🎯 Markdown 內文裡的圖片樣式：寬螢幕自動各佔一半空間並排 */
-	.prose :global(img) {
-		flex: 1 1 calc(50% - 0.75rem);
-		min-width: 280px;
+	/*
+		每張圖片佔一半
+	*/
+
+	.prose :global(p:has(> img:only-child) > img) {
+		width: calc(50% - 0.75rem);
 		height: auto;
+		flex: 0 0 calc(50% - 0.75rem);
 		display: block;
 		border-radius: 4px;
+		object-fit: cover;
 		user-select: none;
 		-webkit-user-drag: none;
 		filter: blur(0.6px);
 		transition: filter 0.3s ease;
-		margin-bottom: 0;
-		object-fit: cover;
+		margin: 0;
+		box-sizing: border-box;
 	}
 
-	.protected-img:hover, 
-	.prose :global(img:hover) {
+	.prose :global(p:has(> img:only-child) > img:hover) {
 		filter: blur(0);
 	}
 
-	/* 🎯 Markdown 內文裡的大標題 (h1) 與中標題 (h2) 佔滿整行 */
+
+	/* ========================================
+	   一般圖片
+	   如果圖片不是單獨一個 <p>
+	======================================== */
+
+	.prose :global(img) {
+		max-width: 100%;
+		height: auto;
+		border-radius: 4px;
+		user-select: none;
+		-webkit-user-drag: none;
+	}
+
+
+	/* ========================================
+	   標題
+	======================================== */
+
 	.prose :global(h1) {
 		width: 100%;
 		font-size: 2.5rem !important;
@@ -172,28 +229,43 @@ const activeCategory = project.data?.category || "all";
 		margin-bottom: 0.75rem !important;
 	}
 
-	/* 🖤 獨立的黑色斜線裝飾元素 */
+
+	/* ========================================
+	   斜線
+	======================================== */
+
 	.prose :global(hr.slash) {
-		width: 100%;
-		border: none;
-		outline: none;
 		width: 40px;
 		height: 0.8px;
+		padding: 0;
+		border: none;
+		outline: none;
 		background-color: #000000;
 		margin: 1.5rem 0 2.2rem 0;
 		transform: rotate(-25deg);
 		transform-origin: left center;
 	}
 
-	/* 圖說（灰色小字） */
-	.prose :global(figcaption),
-	.prose :global(p img + em),
-	.prose :global(p img + br + em),
-	.prose :global(p img + span) {
+
+	/* ========================================
+	   圖說
+	======================================== */
+
+	/*
+		支援：
+
+		![圖片](...)
+
+		_圖說_
+	*/
+
+	.prose :global(p:has(img) + p:has(em)) {
 		width: 100%;
-		display: block;
-		margin-top: 0.5rem;
+		margin-top: -0.5rem;
 		margin-bottom: 2.2rem;
+	}
+
+	.prose :global(p:has(img) + p:has(em) em) {
 		font-style: normal;
 		font-size: 0.8rem !important;
 		color: #888888 !important;
@@ -201,8 +273,30 @@ const activeCategory = project.data?.category || "all";
 		letter-spacing: 0.02em;
 	}
 
-	/* 清單樣式 */
-	.prose :global(ul), 
+
+	/* ========================================
+	   Figure / Figcaption
+	======================================== */
+
+	.prose :global(figure) {
+		margin: 0 0 2rem;
+	}
+
+	.prose :global(figcaption) {
+		margin-top: 0.5rem;
+		font-style: normal;
+		font-size: 0.8rem !important;
+		color: #888888 !important;
+		line-height: 1.5;
+		letter-spacing: 0.02em;
+	}
+
+
+	/* ========================================
+	   清單
+	======================================== */
+
+	.prose :global(ul),
 	.prose :global(ol) {
 		width: 100%;
 		margin-left: 1.2rem;
@@ -213,8 +307,13 @@ const activeCategory = project.data?.category || "all";
 		margin-bottom: 0.4rem;
 	}
 
-	/* 📱 手機版調整 */
+
+	/* ========================================
+	   手機版
+	======================================== */
+
 	@media (max-width: 768px) {
+
 		.main-title {
 			font-size: 2rem !important;
 		}
@@ -228,9 +327,18 @@ const activeCategory = project.data?.category || "all";
 			margin-top: 2rem !important;
 		}
 
-		/* 手機版時讓圖片自動恢復單張佔滿全寬上下堆疊 */
-		.prose :global(img) {
-			flex: 1 1 100%;
+		/*
+			手機版圖片改成上下排列
+		*/
+
+		.prose :global(p:has(> img:only-child)) {
+			display: block;
+		}
+
+		.prose :global(p:has(> img:only-child) > img) {
+			width: 100%;
+			flex: none;
+			margin-bottom: 1.5rem;
 		}
 	}
 </style>
